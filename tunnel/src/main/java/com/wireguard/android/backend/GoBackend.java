@@ -24,6 +24,7 @@ import com.wireguard.crypto.KeyFormatException;
 import com.wireguard.util.NonNullForAll;
 
 import java.net.InetAddress;
+import java.net.Socket;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
@@ -36,6 +37,8 @@ import java.util.concurrent.TimeoutException;
 import androidx.annotation.Nullable;
 import androidx.collection.ArraySet;
 
+import dad.xiaomi.uot.Client;
+
 /**
  * Implementation of {@link Backend} that uses the wireguard-go userspace implementation to provide
  * WireGuard tunnels.
@@ -44,12 +47,18 @@ import androidx.collection.ArraySet;
 public final class GoBackend implements Backend {
     private static final int DNS_RESOLUTION_RETRIES = 10;
     private static final String TAG = "WireGuard/GoBackend";
-    @Nullable private static AlwaysOnCallback alwaysOnCallback;
+    @Nullable
+    private static AlwaysOnCallback alwaysOnCallback;
     private static GhettoCompletableFuture<VpnService> vpnService = new GhettoCompletableFuture<>();
     private final Context context;
-    @Nullable private Config currentConfig;
-    @Nullable private Tunnel currentTunnel;
+    @Nullable
+    private Config currentConfig;
+    @Nullable
+    private Tunnel currentTunnel;
     private int currentTunnelHandle = -1;
+
+    @Nullable
+    private Client client;
 
     /**
      * Public constructor for GoBackend.
@@ -71,7 +80,8 @@ public final class GoBackend implements Backend {
         alwaysOnCallback = cb;
     }
 
-    @Nullable private static native String wgGetConfig(int handle);
+    @Nullable
+    private static native String wgGetConfig(int handle);
 
     private static native int wgGetSocketV4(int handle);
 
@@ -256,7 +266,8 @@ public final class GoBackend implements Backend {
             }
 
 
-            dnsRetry: for (int i = 0; i < DNS_RESOLUTION_RETRIES; ++i) {
+            dnsRetry:
+            for (int i = 0; i < DNS_RESOLUTION_RETRIES; ++i) {
                 // Pre-resolve IPs so they're cached when building the userspace string
                 for (final Peer peer : config.getPeers()) {
                     final InetEndpoint ep = peer.getEndpoint().orElse(null);
@@ -273,6 +284,10 @@ public final class GoBackend implements Backend {
                 }
                 break;
             }
+
+            // uot start
+            client = new Client(30928, "192.168.31.26", 22809, "test");
+            Socket uotSocket = client.start();
 
             // Build config
             final String goConfig = config.toWgUserspaceString();
@@ -319,6 +334,7 @@ public final class GoBackend implements Backend {
                 service.setUnderlyingNetworks(null);
 
             builder.setBlocking(true);
+            service.protect(uotSocket);
             try (final ParcelFileDescriptor tun = builder.establish()) {
                 if (tun == null)
                     throw new BackendException(Reason.TUN_CREATION_ERROR);
@@ -334,6 +350,9 @@ public final class GoBackend implements Backend {
             service.protect(wgGetSocketV4(currentTunnelHandle));
             service.protect(wgGetSocketV6(currentTunnelHandle));
         } else {
+            if (client != null) {
+                client.stop();
+            }
             if (currentTunnelHandle == -1) {
                 Log.w(TAG, "Tunnel already down");
                 return;
@@ -345,7 +364,8 @@ public final class GoBackend implements Backend {
             wgTurnOff(handleToClose);
             try {
                 vpnService.get(0, TimeUnit.NANOSECONDS).stopSelf();
-            } catch (final TimeoutException ignored) { }
+            } catch (final TimeoutException ignored) {
+            }
         }
 
         tunnel.onStateChange(state);
@@ -392,7 +412,8 @@ public final class GoBackend implements Backend {
      * {@link android.net.VpnService} implementation for {@link GoBackend}
      */
     public static class VpnService extends android.net.VpnService {
-        @Nullable private GoBackend owner;
+        @Nullable
+        private GoBackend owner;
 
         public Builder getBuilder() {
             return new Builder();
@@ -415,6 +436,9 @@ public final class GoBackend implements Backend {
                     owner.currentTunnelHandle = -1;
                     owner.currentConfig = null;
                     tunnel.onStateChange(State.DOWN);
+                }
+                if (owner.client != null) {
+                    owner.client.stop();
                 }
             }
             vpnService = vpnService.newIncompleteFuture();

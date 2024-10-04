@@ -66,6 +66,10 @@ android {
             withSourcesJar()
         }
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
 }
 
 dependencies {
@@ -109,8 +113,8 @@ publishing {
                         url.set("https://www.wireguard.com/")
                     }
                     developer {
-                        name.set("WireGuard")
-                        email.set("team@wireguard.com")
+                        name.set("rika")
+                        email.set("rikaaa0928@yandex.com")
                     }
                 }
             }

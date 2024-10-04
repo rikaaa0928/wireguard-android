@@ -4,6 +4,11 @@ import com.google.gson.Gson
 import java.security.SecureRandom
 import kotlin.random.Random
 
+fun handShake(stream: PacketOutputStream, pw: String) {
+    val auth_info = generateAuth(pw);
+    stream.write(auth_info.toByteArray(charset = Charsets.UTF_8));
+}
+
 data class Auth(
     val pw: String,
     val rand: String
