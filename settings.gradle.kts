@@ -16,7 +16,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "wireguard-android"
+rootProject.name = "wireguard-android-rika"
 
 include(":tunnel")
 include(":ui")
