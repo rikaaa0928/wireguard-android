@@ -70,6 +70,9 @@ public final class Config {
         boolean seenInterfaceSection = false;
         @Nullable String line;
         while ((line = reader.readLine()) != null) {
+            if (line.startsWith("#uot")) {
+                line = line.substring(1);
+            }
             final int commentIndex = line.indexOf('#');
             if (commentIndex != -1)
                 line = line.substring(0, commentIndex);

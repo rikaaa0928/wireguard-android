@@ -47,6 +47,12 @@ public final class Interface {
     private final Optional<Integer> listenPort;
     private final Optional<Integer> mtu;
 
+    private final Optional<Integer> uotListenPort;
+    private final Optional<String> uotDialHost;
+    private final Optional<Integer> uotDialPort;
+    private final Optional<String> uotPW;
+
+
     private Interface(final Builder builder) {
         // Defensively copy to ensure immutability even if the Builder is reused.
         addresses = Collections.unmodifiableSet(new LinkedHashSet<>(builder.addresses));
@@ -57,6 +63,10 @@ public final class Interface {
         keyPair = Objects.requireNonNull(builder.keyPair, "Interfaces must have a private key");
         listenPort = builder.listenPort;
         mtu = builder.mtu;
+        uotListenPort = builder.uotListenPort;
+        uotDialHost = builder.uotDialHost;
+        uotDialPort = builder.uotDialPort;
+        uotPW = builder.uotPW;
     }
 
     /**
@@ -94,6 +104,18 @@ public final class Interface {
                     break;
                 case "privatekey":
                     builder.parsePrivateKey(attribute.getValue());
+                    break;
+                case "uotpw":
+                    builder.setUotPW(attribute.getValue());
+                    break;
+                case "uotlistenport":
+                    builder.parseUotListenPort(attribute.getValue());
+                    break;
+                case "uotdialport":
+                    builder.parseUotDialPort(attribute.getValue());
+                    break;
+                case "uotdialhost":
+                    builder.setUotDialHost(attribute.getValue());
                     break;
                 default:
                     throw new BadConfigException(Section.INTERFACE, Location.TOP_LEVEL,
@@ -195,6 +217,22 @@ public final class Interface {
         return mtu;
     }
 
+    public Optional<Integer> getUotListenPort() {
+        return uotListenPort;
+    }
+
+    public Optional<Integer> getUotDialPort() {
+        return uotDialPort;
+    }
+
+    public Optional<String> getUotDialHost() {
+        return uotDialHost;
+    }
+
+    public Optional<String> getUotPW() {
+        return uotPW;
+    }
+
     @Override
     public int hashCode() {
         int hash = 1;
@@ -245,6 +283,18 @@ public final class Interface {
         listenPort.ifPresent(lp -> sb.append("ListenPort = ").append(lp).append('\n'));
         mtu.ifPresent(m -> sb.append("MTU = ").append(m).append('\n'));
         sb.append("PrivateKey = ").append(keyPair.getPrivateKey().toBase64()).append('\n');
+        if (uotListenPort.isPresent()){
+            sb.append("#uotListenPort = ").append(uotListenPort.get()).append('\n');
+        }
+        if (uotPW.isPresent()){
+            sb.append("#uotPW = ").append(uotPW.get()).append('\n');
+        }
+        if (uotDialPort.isPresent()){
+            sb.append("#uotDialPort = ").append(uotDialPort.get()).append('\n');
+        }
+        if (uotDialHost.isPresent()){
+            sb.append("#uotDialHost = ").append(uotDialHost.get()).append('\n');
+        }
         return sb.toString();
     }
 
@@ -279,6 +329,11 @@ public final class Interface {
         private Optional<Integer> listenPort = Optional.empty();
         // Defaults to not present.
         private Optional<Integer> mtu = Optional.empty();
+
+        private Optional<Integer> uotListenPort = Optional.empty();
+        private Optional<String> uotDialHost = Optional.empty();
+        private Optional<Integer> uotDialPort = Optional.empty();
+        private Optional<String> uotPW = Optional.empty();
 
         public Builder addAddress(final InetNetwork address) {
             addresses.add(address);
@@ -417,6 +472,48 @@ public final class Interface {
                 throw new BadConfigException(Section.INTERFACE, Location.LISTEN_PORT,
                         Reason.INVALID_VALUE, String.valueOf(mtu));
             this.mtu = mtu == 0 ? Optional.empty() : Optional.of(mtu);
+            return this;
+        }
+
+        public Builder parseUotListenPort(final String port) throws BadConfigException {
+            try {
+                return setUotListenPort(Integer.parseInt(port));
+            } catch (final NumberFormatException e) {
+                throw new BadConfigException(Section.INTERFACE, Location.UOT_LPORT, port, e);
+            }
+        }
+
+        public Builder parseUotDialPort(final String port) throws BadConfigException {
+            try {
+                return setUotDialPort(Integer.parseInt(port));
+            } catch (final NumberFormatException e) {
+                throw new BadConfigException(Section.INTERFACE, Location.UOT_DPORT, port, e);
+            }
+        }
+
+        public Builder setUotListenPort(final int listenPort) throws BadConfigException {
+            if (listenPort < MIN_UDP_PORT || listenPort > MAX_UDP_PORT)
+                throw new BadConfigException(Section.INTERFACE, Location.LISTEN_PORT,
+                        Reason.INVALID_VALUE, String.valueOf(listenPort));
+            this.uotListenPort = listenPort == 0 ? Optional.empty() : Optional.of(listenPort);
+            return this;
+        }
+
+        public Builder setUotDialPort(final int port) throws BadConfigException {
+            if (port < MIN_UDP_PORT || port > MAX_UDP_PORT)
+                throw new BadConfigException(Section.INTERFACE, Location.LISTEN_PORT,
+                        Reason.INVALID_VALUE, String.valueOf(port));
+            this.uotDialPort = port == 0 ? Optional.empty() : Optional.of(port);
+            return this;
+        }
+
+        public Builder setUotDialHost(final String host) {
+            this.uotDialHost = Optional.of(host);
+            return this;
+        }
+
+        public Builder setUotPW(final String pw) {
+            this.uotPW = Optional.of(pw);
             return this;
         }
     }

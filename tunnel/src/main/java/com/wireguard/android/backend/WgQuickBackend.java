@@ -55,7 +55,8 @@ public final class WgQuickBackend implements Backend {
     }
 
     public static boolean hasKernelSupport() {
-        return new File("/sys/module/wireguard").exists();
+//        return new File("/sys/module/wireguard").exists();
+        return false;
     }
 
     @Override

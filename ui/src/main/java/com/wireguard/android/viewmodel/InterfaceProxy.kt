@@ -54,6 +54,34 @@ class InterfaceProxy : BaseObservable, Parcelable {
         }
 
     @get:Bindable
+    var uotListenPort: String = ""
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.uotListenPort)
+        }
+
+    @get:Bindable
+    var uotPW: String = ""
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.uotPW)
+        }
+
+    @get:Bindable
+    var uotDialHost: String = ""
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.uotDialHost)
+        }
+
+    @get:Bindable
+    var uotDialPort: String = ""
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.uotDialPort)
+        }
+
+    @get:Bindable
     var privateKey: String = ""
         set(value) {
             field = value
@@ -77,6 +105,10 @@ class InterfaceProxy : BaseObservable, Parcelable {
         listenPort = parcel.readString() ?: ""
         mtu = parcel.readString() ?: ""
         privateKey = parcel.readString() ?: ""
+        uotPW = parcel.readString() ?: ""
+        uotListenPort = parcel.readString() ?: ""
+        uotDialHost = parcel.readString() ?: ""
+        uotDialPort = parcel.readString() ?: ""
     }
 
     constructor(other: Interface) {
@@ -89,6 +121,10 @@ class InterfaceProxy : BaseObservable, Parcelable {
         mtu = other.mtu.map { it.toString() }.orElse("")
         val keyPair = other.keyPair
         privateKey = keyPair.privateKey.toBase64()
+        uotPW = other.uotPW.map { it }.orElse("")
+        uotDialHost = other.uotDialHost.map { it }.orElse("")
+        uotDialPort = other.uotDialPort.map { it.toString() }.orElse("")
+        uotListenPort = other.uotListenPort.map { it.toString() }.orElse("")
     }
 
     constructor()
@@ -112,6 +148,10 @@ class InterfaceProxy : BaseObservable, Parcelable {
         if (listenPort.isNotEmpty()) builder.parseListenPort(listenPort)
         if (mtu.isNotEmpty()) builder.parseMtu(mtu)
         if (privateKey.isNotEmpty()) builder.parsePrivateKey(privateKey)
+        if (uotPW.isNotEmpty()) builder.setUotPW(uotPW)
+        if (uotDialHost.isNotEmpty()) builder.setUotDialHost(uotDialHost)
+        if (uotListenPort.isNotEmpty()) builder.parseUotListenPort(uotListenPort)
+        if (uotDialPort.isNotEmpty()) builder.parseUotDialPort(uotDialPort)
         return builder.build()
     }
 
@@ -123,6 +163,10 @@ class InterfaceProxy : BaseObservable, Parcelable {
         dest.writeString(listenPort)
         dest.writeString(mtu)
         dest.writeString(privateKey)
+        dest.writeString(uotPW)
+        dest.writeString(uotListenPort)
+        dest.writeString(uotDialHost)
+        dest.writeString(uotDialPort)
     }
 
     private class InterfaceProxyCreator : Parcelable.Creator<InterfaceProxy> {

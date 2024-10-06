@@ -286,8 +286,17 @@ public final class GoBackend implements Backend {
             }
 
             // uot start
-            client = new Client(30928, "192.168.31.26", 22809, "test");
-            Socket uotSocket = client.start();
+            if (client != null) {
+                client.stop();
+                client = null;
+            }
+            if (config.getInterface().getUotDialHost().isPresent()) {
+                client = new Client(config.getInterface().getUotListenPort().get()
+                        , config.getInterface().getUotDialHost().get(),
+                        config.getInterface().getUotDialPort().get(),
+                        config.getInterface().getUotPW().get());
+                client.start();
+            }
 
             // Build config
             final String goConfig = config.toWgUserspaceString();
@@ -334,7 +343,7 @@ public final class GoBackend implements Backend {
                 service.setUnderlyingNetworks(null);
 
             builder.setBlocking(true);
-            service.protect(uotSocket);
+//            service.protect(uotSocket);
             try (final ParcelFileDescriptor tun = builder.establish()) {
                 if (tun == null)
                     throw new BackendException(Reason.TUN_CREATION_ERROR);
@@ -352,6 +361,7 @@ public final class GoBackend implements Backend {
         } else {
             if (client != null) {
                 client.stop();
+                client = null;
             }
             if (currentTunnelHandle == -1) {
                 Log.w(TAG, "Tunnel already down");
@@ -439,6 +449,7 @@ public final class GoBackend implements Backend {
                 }
                 if (owner.client != null) {
                     owner.client.stop();
+                    owner.client = null;
                 }
             }
             vpnService = vpnService.newIncompleteFuture();

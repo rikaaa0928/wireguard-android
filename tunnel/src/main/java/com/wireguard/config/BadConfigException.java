@@ -78,7 +78,11 @@ public class BadConfigException extends Exception {
         PERSISTENT_KEEPALIVE("PersistentKeepalive"),
         PRE_SHARED_KEY("PresharedKey"),
         PRIVATE_KEY("PrivateKey"),
-        PUBLIC_KEY("PublicKey");
+        PUBLIC_KEY("PublicKey"),
+        UOT_LPORT("uotListenPort"),
+        UOT_PW("uotPW"),
+        UOT_DPORT("uotDialPort"),
+        UOT_DHOST("uotDialHost");
 
         private final String name;
 

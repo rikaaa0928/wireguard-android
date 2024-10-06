@@ -210,7 +210,7 @@
                                 android:imeOptions="actionNext"
                                 android:inputType="textNoSuggestions|textVisiblePassword"
                                 android:nextFocusUp="@id/addresses_label_text"
-                                android:nextFocusDown="@id/set_excluded_applications"
+                                android:nextFocusDown="@id/uot_pw_text"
                                 android:nextFocusForward="@id/mtu_text"
                                 android:text="@={config.interface.dnsServers}" />
                         </com.google.android.material.textfield.TextInputLayout>
@@ -241,6 +241,106 @@
                                 android:textAlignment="center" />
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/uot_pw_label_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:hint="UOT PW"
+                            app:layout_constraintEnd_toStartOf="@id/uot_l_port_label_layout"
+                            app:layout_constraintHorizontal_chainStyle="spread"
+                            app:layout_constraintHorizontal_weight="0.7"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/dns_servers_label_layout">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/uot_pw_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionNext"
+                                android:inputType="textNoSuggestions|textVisiblePassword"
+                                android:nextFocusUp="@id/dns_servers_text"
+                                android:nextFocusDown="@id/uot_host_label_layout"
+                                android:nextFocusForward="@id/uot_d_port_label_layout"
+                                android:text="@={config.interface.uotPW}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/uot_l_port_label_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:hint="Listen port"
+                            app:expandedHintEnabled="false"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_weight="0.3"
+                            app:layout_constraintStart_toEndOf="@id/uot_pw_label_layout"
+                            app:layout_constraintTop_toBottomOf="@id/dns_servers_label_layout">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/uot_l_port_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="UOT"
+                                android:imeOptions="actionDone"
+                                android:inputType="number"
+                                android:nextFocusUp="@id/mtu_text"
+                                android:nextFocusDown="@id/uot_host_label_layout"
+                                android:nextFocusForward="@id/uot_d_port_label_layout"
+                                android:text="@={config.interface.uotListenPort}"
+                                android:textAlignment="center" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/uot_host_label_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:hint="UOT host"
+                            app:layout_constraintEnd_toStartOf="@id/uot_d_port_label_layout"
+                            app:layout_constraintHorizontal_chainStyle="spread"
+                            app:layout_constraintHorizontal_weight="0.7"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/uot_pw_label_layout">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/uot_host_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionNext"
+                                android:inputType="textNoSuggestions|textVisiblePassword"
+                                android:nextFocusUp="@id/uot_pw_label_layout"
+                                android:nextFocusDown="@id/set_excluded_applications"
+                                android:nextFocusForward="@id/uot_d_port_label_layout"
+                                android:text="@={config.interface.uotDialHost}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/uot_d_port_label_layout"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:hint="Dial port"
+                            app:expandedHintEnabled="false"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_weight="0.3"
+                            app:layout_constraintStart_toEndOf="@id/uot_host_label_layout"
+                            app:layout_constraintTop_toBottomOf="@id/uot_pw_label_layout">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/uot_d_port_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="UOT"
+                                android:imeOptions="actionDone"
+                                android:inputType="number"
+                                android:nextFocusUp="@id/uot_l_port_text"
+                                android:nextFocusDown="@id/set_excluded_applications"
+                                android:nextFocusForward="@id/set_excluded_applications"
+                                android:text="@={config.interface.uotDialPort}"
+                                android:textAlignment="center" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/set_excluded_applications"
                             style="@style/Widget.Material3.Button.TextButton"
@@ -256,7 +356,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/mtu_label_layout"
+                            app:layout_constraintTop_toBottomOf="@id/uot_d_port_label_layout"
                             app:rippleColor="?attr/colorSecondary"
                             tools:text="4 excluded applications" />
                     </androidx.constraintlayout.widget.ConstraintLayout>

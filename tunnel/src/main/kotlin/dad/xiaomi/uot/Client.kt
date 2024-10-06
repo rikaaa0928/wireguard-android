@@ -19,7 +19,7 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
     var socket: DatagramSocket? = null
     val CONN_TAG = 2809
 
-    fun start(): Socket {
+    fun start() {
         stop.set(false);
         TrafficStats.setThreadStatsTag(CONN_TAG);
         //udp监听srcPort并使用65535的buffer读取数据
@@ -30,9 +30,9 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
 
         // 获取输入输出流
         var inputStream = AtomicReference(PacketInputStream(tcpSocket.getInputStream()))
-        var outputStream = PacketOutputStream(tcpSocket.getOutputStream())
+        var outputStream = AtomicReference(PacketOutputStream(tcpSocket.getOutputStream()))
         // 握手
-        handShake(outputStream, pw)
+        handShake(outputStream.get(), pw)
         GlobalScope.launch {
             while (!stop.get()) {
                 try {
@@ -42,10 +42,17 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                     packet.port = lastPort
                     socket!!.send(packet)
                 } catch (e: Exception) {
-                    Log.e("uot Client", "GlobalScope", e)
+                    if (!stop.get()) {
+                        Log.e("uot Client", "GlobalScope", e)
+                        tcpSocket.close()
+                        tcpSocket = Socket(dstHost, dstPort)
+                        // 获取输入输出流
+                        inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
+                        outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
+                    }
                 }
             }
-            Log.d("uot Client","tcp read loop exit")
+            Log.d("uot Client", "tcp read loop exit")
             tcpSocket.close()
         }
         GlobalScope.launch {
@@ -56,35 +63,40 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                         lastAddr = packet.address.hostName;
                         lastPort = packet.port
                     } else if (lastAddr != packet.address.hostName || lastPort != packet.port) {
-//                    tcpSocket.close()
-//                    tcpSocket = Socket(dstHost, dstPort)
-//                    // 获取输入输出流
-//                    inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
-//                    outputStream = PacketOutputStream(tcpSocket.getOutputStream())
+                        tcpSocket.close()
+                        tcpSocket = Socket(dstHost, dstPort)
+                        // 获取输入输出流
+                        inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
+                        outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
                         Log.e("uot Client", "udp id (ip or port) changed")
                         lastAddr = packet.address.hostName;
                         lastPort = packet.port
                     }
                     val receivedData = packet.data.copyOfRange(0, packet.length)
                     val str = String(receivedData)
-                    Log.i("uot Client receive", str)
-                    outputStream.write(receivedData)
+//                    Log.d("uot Client receive", str)
+                    outputStream.get().write(receivedData)
                 } catch (e: Exception) {
-                    Log.e("uot Client", "main while", e)
-//                throw e;
+                    if (!stop.get()) {
+                        Log.e("uot Client", "main while", e)
+                        tcpSocket.close()
+                        tcpSocket = Socket(dstHost, dstPort)
+                        // 获取输入输出流
+                        inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
+                        outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
+                    }
                 }
             }
-            Log.d("uot Client","tcp write loop exit")
+            Log.d("uot Client", "tcp write loop exit")
             tcpSocket.close()
         }
-        return tcpSocket
     }
 
     fun stop() {
+        stop.set(true)
         if (socket != null) {
             socket!!.close()
         }
-        stop.set(true)
         TrafficStats.clearThreadStatsTag();
     }
 }
