@@ -49,6 +49,8 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                         // 获取输入输出流
                         inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
                         outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
+                        // 握手
+                        handShake(outputStream.get(), pw)
                     }
                 }
             }
@@ -68,6 +70,9 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                         // 获取输入输出流
                         inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
                         outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
+                        // 握手
+                        handShake(outputStream.get(), pw)
+
                         Log.e("uot Client", "udp id (ip or port) changed")
                         lastAddr = packet.address.hostName;
                         lastPort = packet.port
@@ -84,6 +89,8 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                         // 获取输入输出流
                         inputStream.set(PacketInputStream(tcpSocket.getInputStream()))
                         outputStream.set(PacketOutputStream(tcpSocket.getOutputStream()))
+                        // 握手
+                        handShake(outputStream.get(), pw)
                     }
                 }
             }
