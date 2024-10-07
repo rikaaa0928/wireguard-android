@@ -1,10 +1,12 @@
 package dad.xiaomi.uot
 
+import android.util.Log
 import com.google.gson.Gson
 import java.security.SecureRandom
 import kotlin.random.Random
 
 fun handShake(stream: PacketOutputStream, pw: String) {
+    Log.w("uot Client", "handshake")
     val auth_info = generateAuth(pw);
     stream.write(auth_info.toByteArray(charset = Charsets.UTF_8));
 }

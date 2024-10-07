@@ -287,6 +287,7 @@ public final class GoBackend implements Backend {
 
             // uot start
             if (client != null) {
+                Log.w("GoBackend uot Client", "conflict");
                 client.stop();
                 client = null;
             }
