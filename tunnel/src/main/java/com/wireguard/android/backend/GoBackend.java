@@ -288,10 +288,10 @@ public final class GoBackend implements Backend {
             // uot start
             if (client != null) {
                 Log.w("GoBackend uot Client", "conflict");
-                client.stop();
-                client = null;
+//                client.stop();
+//                client = null;
             }
-            if (config.getInterface().getUotDialHost().isPresent()) {
+            if (client == null && config.getInterface().getUotDialHost().isPresent()) {
                 client = new Client(config.getInterface().getUotListenPort().get()
                         , config.getInterface().getUotDialHost().get(),
                         config.getInterface().getUotDialPort().get(),

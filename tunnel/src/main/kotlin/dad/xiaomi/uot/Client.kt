@@ -1,6 +1,5 @@
 package dad.xiaomi.uot
 
-import android.icu.util.TimeUnit
 import android.net.TrafficStats
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -46,7 +45,7 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                     socket!!.send(packet)
                 } catch (e: Exception) {
                     if (!stop.get()) {
-                        Log.e("uot Client", "GlobalScope", e)
+                        Log.e("uot Client", "GlobalScope tcp read loop", e)
                         tcpSocket.close()
                         tcpSocket = Socket(dstHost, dstPort)
                         // 获取输入输出流
@@ -87,7 +86,7 @@ class Client(val srcPort: Int, val dstHost: String, val dstPort: Int, val pw: St
                     outputStream.get().write(receivedData)
                 } catch (e: Exception) {
                     if (!stop.get()) {
-                        Log.e("uot Client", "main while", e)
+                        Log.e("uot Client", "tcp write loop", e)
                         tcpSocket.close()
                         java.util.concurrent.TimeUnit.MILLISECONDS.sleep(100L)
 //                        tcpSocket = Socket(dstHost, dstPort)
