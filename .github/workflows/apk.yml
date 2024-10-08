@@ -48,13 +48,11 @@ jobs:
         shell: bash
         run: |
           # Replace with the name of your binary
-          binary_name="wireguard-rika"
 
           dirname="$binary_name-${{ env.VERSION }}"
           mkdir "$dirname"
-          mv "ui/build/outputs/apk/release/ui-release-unsigned.apk" "$dirname/$binary_name.apk"
-          tar -czf "$dirname.tar.gz" "$dirname"
-          echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
+          mv "ui/build/outputs/apk/release/ui-release-unsigned.apk" "$dirname.apk"
+          echo "ASSET=$dirname.apk" >> $GITHUB_ENV
           
 
       - name: Release
