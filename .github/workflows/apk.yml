@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           # Replace with the name of your binary
-
+          binary_name="wireguard-rika"
           dirname="$binary_name-${{ env.VERSION }}"
           mkdir "$dirname"
           mv "ui/build/outputs/apk/release/ui-release-unsigned.apk" "$dirname.apk"
