@@ -54,6 +54,17 @@ jobs:
           mv "ui/build/outputs/apk/release/ui-release-unsigned.apk" "$dirname.apk"
           echo "ASSET=$dirname.apk" >> $GITHUB_ENV
           
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign app APK
+        if: startsWith(github.ref, 'refs/tags/')
+        # ID used to access action output
+        id: sign_app
+        with:
+          releaseDirectory: ./
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
