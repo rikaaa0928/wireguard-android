@@ -19,3 +19,5 @@ gradlew.bat
 maint/
 .kotlin
 /.kotlin/
+/release/
+release/
