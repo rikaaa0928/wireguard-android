@@ -6,6 +6,7 @@ val pkg: String = providers.gradleProperty("wireguardPackageName").get()
 
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
     `maven-publish`
     signing
 }
@@ -56,17 +57,26 @@ android {
         disable += "LongLogTag"
         disable += "NewApi"
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
     publishing {
         singleVariant("release") {
             withJavadocJar()
             withSourcesJar()
         }
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
 }
 
 dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.collection)
+    implementation(libs.core.ktx)
+    implementation("com.google.code.gson:gson:2.11.0")
     compileOnly(libs.jsr305)
     testImplementation(libs.junit)
 }
@@ -103,8 +113,8 @@ publishing {
                         url.set("https://www.wireguard.com/")
                     }
                     developer {
-                        name.set("WireGuard")
-                        email.set("team@wireguard.com")
+                        name.set("rika")
+                        email.set("rikaaa0928@yandex.com")
                     }
                 }
             }

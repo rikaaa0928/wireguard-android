@@ -16,3 +16,9 @@ build/
 *.jks
 gradlew.bat
 maint/
+.kotlin
+/.kotlin/
+/release/
+release/
+.idea/
+/.idea/

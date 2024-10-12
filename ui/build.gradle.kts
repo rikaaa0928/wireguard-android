@@ -20,7 +20,7 @@ android {
     }
     namespace = pkg
     defaultConfig {
-        applicationId = pkg
+        applicationId = "dad.xiaomi.wireguard"
         minSdk = 21
         targetSdk = 34
         versionCode = providers.gradleProperty("wireguardVersionCode").get().toInt()
